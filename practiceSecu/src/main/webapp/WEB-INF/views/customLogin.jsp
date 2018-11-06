@@ -23,8 +23,8 @@
 </div>
 <div>
 	<input type='submit'>
+<input type="checkbox" name="remember-me">REMEMBER ME
 </div>
-
 <input type='hidden' name="${_csrf.parameterName}" value="${_csrf.token}" />
 </form>
 </body>

@@ -10,14 +10,17 @@
 
 	<bean id="customAccessDenied" class="org.casper.security.CustomAccessDeniedHandler"></bean>
 	<bean id="customLoginSuccess" class="org.casper.security.CustomLoginSuccessHandler"></bean>
-	<bean id="customPasswordEncoder" class="org.casper.security.CustomNoOpPasswordEncoder"></bean>
-	
+	<!-- <bean id="customPasswordEncoder" class="org.casper.security.CustomNoOpPasswordEncoder"></bean> -->
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	<bean id="customUserDetailsService" class="org.casper.security.CustomUserDetailsService"></bean>
+
 	
 	<security:http>
 	
 		<security:intercept-url pattern="/sample/all" access="permitAll"/>
 		<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MANAGER')"/>
 		<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+		<security:intercept-url pattern="/sample/register" access="isAuthenticated()" />
 		
 		<!-- <security:access-denied-handler error-page="/accessError"/> -->
 		<security:access-denied-handler ref="customAccessDenied"/>
@@ -25,14 +28,19 @@
 		<!-- <security:form-login/> -->
 		<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>
 		
-		<security:logout logout-url="/customLogout" invalidate-session="true"/>
+		<security:logout logout-url="/customLogout" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>
+		
+		<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>
+		
+
 	</security:http>
 	
 	<security:authentication-manager>
 	
-		<security:authentication-provider>
-			<security:jdbc-user-service data-source-ref="dataSource" />
-			<security:password-encoder ref="customPasswordEncoder"/>
+		<security:authentication-provider user-service-ref="customUserDetailsService">
+			
+			<!-- <security:password-encoder ref="customPasswordEncoder"/> -->
+			<security:password-encoder ref="bcryptPasswordEncoder"></security:password-encoder>
 		
 		</security:authentication-provider>
 	</security:authentication-manager>

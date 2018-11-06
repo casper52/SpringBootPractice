@@ -28,4 +28,9 @@ public class SampleController {
 		
 		log.info("admin only");
 	}
+	
+	@GetMapping("/register")
+	public void register() {
+		log.info("register...");
+	}
 }
