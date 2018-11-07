@@ -5,6 +5,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,18 @@ import com.zaxxer.hikari.HikariDataSource;
 @EnableTransactionManagement
 @EnableScheduling
 public class RootConfig {
+	
+	@Value("${db.driverClassName}")
+	private String dName;
+	
+	@Value("${db.jdbcUrl")
+	private String url;
+	
+	@Value("${db.username}")
+	private String userName;
+	
+	@Value("${db.password}")
+	private String pw;
 	
 	@Bean
 	public DataSourceTransactionManager dataSourceTransactionManager() {

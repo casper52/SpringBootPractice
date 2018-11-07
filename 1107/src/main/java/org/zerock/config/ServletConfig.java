@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -13,8 +16,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+@Configuration
 @EnableWebMvc
-@ComponentScan(basePackages= {"org.zerock.controller"})
+@ComponentScan(basePackages= {"org.zerock.controller","org.zerock.service"})
+@PropertySource(value= {"classpath:config.properties","classpath:persistence.properties"})
 public class ServletConfig implements WebMvcConfigurer {
 
 	@Override
@@ -48,6 +53,14 @@ public class ServletConfig implements WebMvcConfigurer {
 		
 		resolver.setDefaultEncoding("UTF-8");
 		return resolver;
+	}
+	
+	@Bean
+	public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+		PropertySourcesPlaceholderConfigurer pspc = new PropertySourcesPlaceholderConfigurer();
+		pspc.setIgnoreUnresolvablePlaceholders(true);
+		
+		return pspc;
 	}
 	
 }
