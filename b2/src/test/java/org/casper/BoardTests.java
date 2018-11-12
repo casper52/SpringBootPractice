@@ -1,5 +1,6 @@
 package org.casper;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.casper.domain.BoardVO;
@@ -24,6 +25,25 @@ public class BoardTests {
 
 	@Setter(onMethod_=@Autowired)
 	private BoardRepositery boardRepositery;
+	
+	@Test
+	public void testQ1() {
+		Pageable pageable = PageRequest.of(0, 10,Sort.Direction.DESC,"bno");
+		
+		Page<BoardVO> result = boardRepositery.getList(pageable);
+		
+		log.info(""+result);
+		
+		log.info("TOTAL PAGES: "+result.getTotalPages());
+		log.info("PAGE: "+result.getNumber());
+		log.info("NEXT: "+result.hasNext());
+		log.info("PREV: "+result.hasPrevious());
+		
+		log.info("P NEXT: "+ result.nextPageable());
+		log.info("P PREV: "+ result.previousPageable());
+		
+		result.getContent().forEach(vo -> log.info(""+ vo));
+	}
 	
 	@Test
 	public void testFind3() {
@@ -83,11 +103,11 @@ public class BoardTests {
 	@Test
 	public void testInsert() {
 		
-		IntStream.range(0,100).forEach(i -> {
+		IntStream.range(100,1000).forEach(i -> {
 			BoardVO vo = new BoardVO();
-			vo.setTitle("게시물"+i);
-			vo.setContent("내용"+i);
-			vo.setWriter("user"+ (i%10));
+			vo.setTitle("초키포키"+i);
+			vo.setContent("밀크티"+i);
+			vo.setWriter("casper"+ (i%10));
 			
 			boardRepositery.save(vo);
 		});
