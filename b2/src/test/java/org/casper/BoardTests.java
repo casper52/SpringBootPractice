@@ -1,9 +1,10 @@
 package org.casper;
 
-import java.util.Arrays;
+
 import java.util.stream.IntStream;
 
 import org.casper.domain.BoardVO;
+import org.casper.domain.QBoardVO;
 import org.casper.persistance.BoardRepositery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 import lombok.Setter;
 import lombok.extern.java.Log;
@@ -27,53 +30,68 @@ public class BoardTests {
 	private BoardRepositery boardRepositery;
 	
 	@Test
-	public void testQ1() {
-		Pageable pageable = PageRequest.of(0, 10,Sort.Direction.DESC,"bno");
+	public void testDynamic() {
+		String[] types= {"t","c"};
+		String keyword="10";
 		
-		Page<BoardVO> result = boardRepositery.getList(pageable);
+		BooleanBuilder builder = new BooleanBuilder();	//where 조건문에만 해당.
+		
+		QBoardVO board = QBoardVO.boardVO;
+		
+		BooleanExpression[] arr = new BooleanExpression[types.length];
+		
+		for(int i = 0; i< types.length; i++) {
+			
+			String type = types[i];
+			BooleanExpression cond = null;
+			
+			if(type.equals("t")) {
+				cond = board.title.contains(keyword);
+			
+			}else if(type.equals("c")) {
+				cond = board.content.contains(keyword);
+			}
+		
+			arr[i] = cond;
+		}
+		
+		builder.andAnyOf(arr);
+		builder.and(board.bno.gt(0));
+		
+		Page<BoardVO> result = boardRepositery.findAll(builder, PageRequest.of(0, 10, Sort.Direction.DESC,"bno"));
 		
 		log.info(""+result);
-		
-		log.info("TOTAL PAGES: "+result.getTotalPages());
-		log.info("PAGE: "+result.getNumber());
-		log.info("NEXT: "+result.hasNext());
-		log.info("PREV: "+result.hasPrevious());
-		
-		log.info("P NEXT: "+ result.nextPageable());
-		log.info("P PREV: "+ result.previousPageable());
-		
-		result.getContent().forEach(vo -> log.info(""+ vo));
 	}
 	
 	@Test
-	public void testFind3() {
-		
-		Pageable pageable = PageRequest.of(0, 5,Sort.Direction.DESC,"bno");
-		boardRepositery.findByTitleContainingAndBnoGreaterThan("7", 0L, pageable).forEach(vo -> log.info(""+vo));
-		
-	}
-	
-
-	
-	@Test
-	public void testFind1() {
-		
-		Pageable pageable = PageRequest.of(0, 10,Sort.Direction.DESC,"bno");
-		
-		Page<BoardVO> result = boardRepositery.findByBnoGreaterThan(0L, pageable);
-		
+	public void testWriter() {
+		Page<BoardVO> result = boardRepositery.getListByWriter("5", PageRequest.of(0, 10));
 		log.info(""+result);
-		
-		log.info("TOTAL PAGES: "+result.getTotalPages());
-		log.info("PAGE: "+result.getNumber());
-		log.info("NEXT: "+result.hasNext());
-		log.info("PREV: "+result.hasPrevious());
-		
-		log.info("P NEXT: "+ result.nextPageable());
-		log.info("P PREV: "+ result.previousPageable());
 		
 		result.getContent().forEach(vo -> log.info(""+vo));
+	}
+	
+	@Test
+	public void testContent() {
+		Page<BoardVO> result = boardRepositery.getListByContent("10", PageRequest.of(0, 10));
+		log.info(""+result);
 		
+		result.getContent().forEach(vo -> log.info(""+vo));
+	}
+	
+	@Test
+	public void testTitle() {
+		Page<BoardVO> result = boardRepositery.getListByTitle("10", PageRequest.of(0, 10));
+		log.info(""+result);
+		
+		result.getContent().forEach(vo -> log.info(""+vo));
+	}
+	
+	@Test
+	public void testList() {
+		
+		Page<BoardVO> result = boardRepositery.getList(PageRequest.of(0, 10));
+		log.info(""+result);
 	}
 	
 	@Test

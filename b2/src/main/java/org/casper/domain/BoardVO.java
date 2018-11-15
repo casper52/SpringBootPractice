@@ -36,5 +36,5 @@ public class BoardVO {
 	private LocalDateTime regdate;
 	@UpdateTimestamp
 	private LocalDateTime updatedate;
-	
+	  
 }
